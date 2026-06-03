@@ -1,0 +1,25 @@
+source_lang: ru
+target_lang: zh
+display_name: 俄译中
+default_domain: general
+domains:
+  - general
+  - education
+  - business
+  - literature
+levels:
+  - A2
+  - B1
+  - B2
+  - C1
+evaluation_dimensions:
+  - accuracy
+  - fluency
+  - terminology
+  - grammar
+  - strategy
+teaching_focus:
+  - 俄语长句拆分
+  - 汉语信息重组
+  - 文化负载词处理
+  - 文体自然度

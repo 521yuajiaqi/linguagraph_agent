@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+langgraph
+langchain-openai
+python-dotenv
+PyYAML
+pytest>=8.3,<9

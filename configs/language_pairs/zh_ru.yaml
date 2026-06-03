@@ -1,0 +1,25 @@
+source_lang: zh
+target_lang: ru
+display_name: 中译俄
+default_domain: general
+domains:
+  - general
+  - education
+  - business
+  - literature
+levels:
+  - A2
+  - B1
+  - B2
+  - C1
+evaluation_dimensions:
+  - accuracy
+  - fluency
+  - terminology
+  - grammar
+  - strategy
+teaching_focus:
+  - 汉俄语序转换
+  - 俄语格和体的选择
+  - 术语一致性
+  - 正式文体表达

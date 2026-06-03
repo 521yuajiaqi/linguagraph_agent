@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment & secrets
+.env
+openai.env
+
+# Logs
+*.log
+
+# Node
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code local settings
+.claude/
+
+# Session data (user-specific)
+.sessions/
+
+# Prevent nested git repos
+frontend/.git/
+
+# Pytest
+.pytest_cache/

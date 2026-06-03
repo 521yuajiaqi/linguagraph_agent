@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f3f5f8;
+  --panel: #ffffff;
+  --panel-soft: #f8fafc;
+  --text: #172033;
+  --muted: #64748b;
+  --line: #d7deea;
+  --accent: #1864ab;
+  --accent-dark: #124f86;
+  --green: #1f7a53;
+  --amber: #a65f00;
+  --danger: #b91c1c;
+  --purple: #7c3aed;
+  --teal: #0d9488;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-soft: var(--panel-soft);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
+  --color-green: var(--green);
+  --color-amber: var(--amber);
+  --color-danger: var(--danger);
+  --color-purple: var(--purple);
+  --color-teal: var(--teal);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans), "Microsoft YaHei", "PingFang SC", sans-serif;
+}
