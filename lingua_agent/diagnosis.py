@@ -11,6 +11,7 @@ from typing import Any
 
 from lingua_agent.config import load_language_pair
 from lingua_agent.llm import LLMClient
+from lingua_agent.prompts import build_quick_score_prompt
 
 llm = LLMClient()
 
@@ -256,14 +257,7 @@ def _quick_score(
     user_answer: str, reference: str, source: str, pair_config: dict[str, Any]
 ) -> int:
     """Lightweight LLM-based scoring for a single short translation (1-5 scale)."""
-    system = (
-        "你是翻译评分专家。请对以下短句翻译进行快速评分（1-5分），只输出数字。"
-    )
-    user = (
-        f"原文：{source}\n学生译文：{user_answer}\n参考译文：{reference}\n\n"
-        f"评分标准：5=完美, 4=基本准确有小瑕疵, 3=意思对但表达不自然, 2=部分正确, 1=完全错误\n"
-        f"只输出数字（1-5）："
-    )
+    system, user = build_quick_score_prompt(source, user_answer, reference)
     output = llm.complete(system, user).strip()
     try:
         score = int(output)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Literal, Mapping, TypedDict
 
+from lingua_agent.prompts import build_exercise_generation_prompt
 from lingua_agent.state import TranslationAgentState
 
 
@@ -196,22 +197,11 @@ def build_llm_exercise_messages(
     domain: str,
     blueprint: ExerciseBlueprint,
 ) -> tuple[str, str]:
-    system = (
-        "你是翻译教学专家。"
-        "你必须输出严格 JSON，不得输出解释、标题、代码块或额外说明。"
+    return build_exercise_generation_prompt(
+        display_name=pair_config["display_name"],
+        domain=domain,
+        blueprint=blueprint,
     )
-    user = (
-        f"语种方向：{pair_config['display_name']}\n"
-        f"领域：{domain}\n"
-        f"主训练维度：{blueprint['primary_focus']}\n"
-        f"目标等级：{blueprint['target_level']}\n"
-        f"难度窗口：{blueprint['difficulty_band']['floor']} - {blueprint['difficulty_band']['ceiling']}\n"
-        f"句法负荷：{blueprint['syntax_load']}\n"
-        f"术语负荷：{blueprint['terminology_load']}\n"
-        f"教学意图：{blueprint['teaching_intent']}\n"
-        '请输出 {"source_text": "...", "reference_translation": "..."}'
-    )
-    return system, user
 
 
 def validate_generated_exercise_payload(
