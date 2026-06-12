@@ -62,56 +62,42 @@ FOCUS_INTENTS: dict[FocusDimension, str] = {
 
 LOAD_SCORE = {"low": 0, "medium": 1, "high": 2}
 
-TAGGED_EXERCISE_BANK: dict[str, list[ExerciseCandidate]] = {
-    "zh_ru": [
-        {
-            "source_text": "尽管天气不好，他们还是决定去公园散步。",
-            "reference_translation": "Несмотря на плохую погоду, они всё же решили пойти в парк на прогулку.",
-            "language_pair": "zh_ru",
-            "level": "A2",
-            "focus_tags": ["grammar", "accuracy"],
-            "syntax_load": "medium",
-            "terminology_load": "low",
-            "teaching_points": ["concessive_structure", "main_clause_order"],
-            "domain": "general",
-        },
-        {
-            "source_text": "教师提醒学生注意语序和动词支配关系。",
-            "reference_translation": "Преподаватель напоминает студентам обратить внимание на порядок слов и глагольное управление.",
-            "language_pair": "zh_ru",
-            "level": "B1",
-            "focus_tags": ["grammar"],
-            "syntax_load": "medium",
-            "terminology_load": "low",
-            "teaching_points": ["governance", "word_order"],
-            "domain": "education",
-        },
-        {
-            "source_text": "这个平台记录术语并生成词汇卡。",
-            "reference_translation": "Эта платформа фиксирует термины и создаёт словарные карточки.",
-            "language_pair": "zh_ru",
-            "level": "B1",
-            "focus_tags": ["terminology"],
-            "syntax_load": "low",
-            "terminology_load": "medium",
-            "teaching_points": ["term_precision"],
-            "domain": "general",
-        },
-    ],
-    "ru_zh": [
-        {
-            "source_text": "Преподаватель объясняет, почему здесь нужен другой падеж.",
-            "reference_translation": "教师解释为什么这里需要使用另一个格。",
-            "language_pair": "ru_zh",
-            "level": "B1",
-            "focus_tags": ["grammar"],
-            "syntax_load": "medium",
-            "terminology_load": "low",
-            "teaching_points": ["case_selection", "clause_linking"],
-            "domain": "education",
-        }
-    ],
-}
+_EXERCISE_CACHE: dict[str, list[ExerciseCandidate]] = {}
+
+
+def _load_exercise_bank(language_pair: str) -> list[ExerciseCandidate]:
+    """Load tagged exercise bank from JSON file with in-memory cache."""
+    if language_pair in _EXERCISE_CACHE:
+        return _EXERCISE_CACHE[language_pair]
+
+    import json
+    from pathlib import Path
+
+    json_path = Path(__file__).resolve().parents[2] / "resources" / "exercises" / f"{language_pair}.json"
+    if not json_path.exists():
+        _EXERCISE_CACHE[language_pair] = []
+        return []
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    candidates: list[ExerciseCandidate] = []
+    valid_focus_tags = {"accuracy", "fluency", "terminology", "grammar", "strategy"}
+    for item in data:
+        candidates.append({
+            "source_text": str(item.get("source_text", "")),
+            "reference_translation": str(item.get("reference_translation", "")),
+            "language_pair": str(item.get("language_pair", language_pair)),
+            "level": str(item.get("level", "B1")),
+            "focus_tags": [t for t in item.get("focus_tags", []) if t in valid_focus_tags],
+            "syntax_load": str(item.get("syntax_load", "low")),
+            "terminology_load": str(item.get("terminology_load", "low")),
+            "teaching_points": [str(p) for p in item.get("teaching_points", [])],
+            "domain": str(item.get("domain", "general")),
+        })
+
+    _EXERCISE_CACHE[language_pair] = candidates
+    return candidates
 
 
 def _normalize_focus(value: str | None) -> FocusDimension | None:
@@ -130,9 +116,15 @@ def _difficulty_band_for_level(level: str) -> DifficultyBand:
 def _score_candidate(candidate: ExerciseCandidate, blueprint: ExerciseBlueprint, previous_source: str) -> int:
     score = 0
     if candidate["level"] == blueprint["target_level"]:
-        score += 4
+        score += 6
     elif candidate["level"] in {blueprint["difficulty_band"]["floor"], blueprint["difficulty_band"]["ceiling"]}:
-        score += 2
+        score += 3
+    else:
+        # Severe penalty for level mismatch (prevents A1 exercise for C1 user)
+        candidate_idx = LEVEL_ORDER.index(candidate["level"]) if candidate["level"] in LEVEL_ORDER else 2
+        blueprint_idx = LEVEL_ORDER.index(blueprint["target_level"]) if blueprint["target_level"] in LEVEL_ORDER else 2
+        level_gap = abs(candidate_idx - blueprint_idx)
+        score -= level_gap * 4
 
     if blueprint["primary_focus"] in candidate["focus_tags"]:
         score += 6
@@ -167,7 +159,7 @@ def select_exercise_candidate(
     previous_source: str,
     bank: list[ExerciseCandidate] | None = None,
 ) -> ExerciseSelectionResult | None:
-    candidates = TAGGED_EXERCISE_BANK.get(language_pair, []) if bank is None else bank
+    candidates = _load_exercise_bank(language_pair) if bank is None else bank
     ranked: list[ExerciseSelectionResult] = []
 
     for candidate in candidates:

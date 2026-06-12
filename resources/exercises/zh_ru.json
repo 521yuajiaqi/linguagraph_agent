@@ -1,0 +1,170 @@
+[
+  {
+    "source_text": "我喜欢学习语言。",
+    "reference_translation": "Мне нравится изучать языки.",
+    "level": "A1", "focus_tags": ["accuracy"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["basic_sentence"], "domain": "daily_life"
+  },
+  {
+    "source_text": "这是我的书。",
+    "reference_translation": "Это моя книга.",
+    "level": "A1", "focus_tags": ["accuracy"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["possessive_pronoun"], "domain": "daily_life"
+  },
+  {
+    "source_text": "今天天气很好。",
+    "reference_translation": "Сегодня хорошая погода.",
+    "level": "A1", "focus_tags": ["fluency"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["weather_expression"], "domain": "daily_life"
+  },
+  {
+    "source_text": "他是一名俄语教师。",
+    "reference_translation": "Он преподаватель русского языка.",
+    "level": "A1", "focus_tags": ["accuracy", "terminology"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["profession_naming"], "domain": "education"
+  },
+  {
+    "source_text": "我每天早上七点起床。",
+    "reference_translation": "Я встаю в семь часов каждое утро.",
+    "level": "A2", "focus_tags": ["fluency"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["time_expression", "reflexive_verb"], "domain": "daily_life"
+  },
+  {
+    "source_text": "她喜欢在图书馆看书。",
+    "reference_translation": "Она любит читать книги в библиотеке.",
+    "level": "A2", "focus_tags": ["accuracy"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["place_expression", "infinitive"], "domain": "education"
+  },
+  {
+    "source_text": "我用手机查单词。",
+    "reference_translation": "Я пользуюсь телефоном для поиска слов.",
+    "level": "A2", "focus_tags": ["grammar", "terminology"],
+    "syntax_load": "low", "terminology_load": "medium",
+    "teaching_points": ["instrumental_case", "purpose_clause"], "domain": "technology"
+  },
+  {
+    "source_text": "周末我常常和朋友去公园散步。",
+    "reference_translation": "По выходным я часто хожу в парк гулять с друзьями.",
+    "level": "A2", "focus_tags": ["fluency"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["movement_verbs", "time_expression"], "domain": "daily_life"
+  },
+  {
+    "source_text": "他在一家翻译公司工作。",
+    "reference_translation": "Он работает в переводческой компании.",
+    "level": "A2", "focus_tags": ["accuracy", "terminology"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["prepositional_case", "adjective_formation"], "domain": "business"
+  },
+  {
+    "source_text": "翻译时要注意语序和基本语法。",
+    "reference_translation": "При переводе нужно обращать внимание на порядок слов и базовую грамматику.",
+    "level": "B1", "focus_tags": ["grammar", "strategy"],
+    "syntax_load": "medium", "terminology_load": "low",
+    "teaching_points": ["word_order", "impersonal_construction"], "domain": "education"
+  },
+  {
+    "source_text": "人工智能技术正在改变翻译行业的工作方式。",
+    "reference_translation": "Технологии искусственного интеллекта меняют способ работы в переводческой отрасли.",
+    "level": "B1", "focus_tags": ["terminology", "accuracy"],
+    "syntax_load": "medium", "terminology_load": "medium",
+    "teaching_points": ["technical_terms", "present_active"], "domain": "technology"
+  },
+  {
+    "source_text": "虽然他已经学了两年俄语，但还是不太敢开口说。",
+    "reference_translation": "Хотя он уже два года учит русский язык, он всё ещё не решается говорить.",
+    "level": "B1", "focus_tags": ["grammar", "fluency"],
+    "syntax_load": "medium", "terminology_load": "low",
+    "teaching_points": ["concessive_clause", "reflexive_verb"], "domain": "education"
+  },
+  {
+    "source_text": "这个平台可以记录术语并生成词汇卡帮助复习。",
+    "reference_translation": "Эта платформа может фиксировать термины и создавать словарные карточки для повторения.",
+    "level": "B1", "focus_tags": ["terminology", "accuracy"],
+    "syntax_load": "medium", "terminology_load": "medium",
+    "teaching_points": ["modal_verb", "purpose_clause"], "domain": "technology"
+  },
+  {
+    "source_text": "一个好的翻译既要准确传达原意，又要符合目标语的表达习惯。",
+    "reference_translation": "Хороший перевод должен и точно передавать исходный смысл, и соответствовать нормам выражения целевого языка.",
+    "level": "B1", "focus_tags": ["strategy", "fluency"],
+    "syntax_load": "medium", "terminology_load": "low",
+    "teaching_points": ["parallel_structure", "modal_expression"], "domain": "education"
+  },
+  {
+    "source_text": "双方就合作细节进行了深入讨论并达成了初步共识。",
+    "reference_translation": "Стороны провели углублённое обсуждение деталей сотрудничества и достигли предварительного соглашения.",
+    "level": "B2", "focus_tags": ["accuracy", "terminology"],
+    "syntax_load": "medium", "terminology_load": "medium",
+    "teaching_points": ["business_terms", "compound_sentence"], "domain": "business"
+  },
+  {
+    "source_text": "基于大语言模型的翻译系统虽然效率高，但在处理文化特定表达时仍有局限。",
+    "reference_translation": "Системы перевода на основе больших языковых моделей, хотя и обладают высокой эффективностью, всё же имеют ограничения при обработке культурно-специфичных выражений.",
+    "level": "B2", "focus_tags": ["strategy", "terminology"],
+    "syntax_load": "high", "terminology_load": "medium",
+    "teaching_points": ["concessive_insertion", "compound_nouns"], "domain": "technology"
+  },
+  {
+    "source_text": "语言迁移现象在二语习得研究中一直是个热点，尤其体现在词汇和句法层面。",
+    "reference_translation": "Явление языкового переноса остаётся актуальной темой в исследованиях усвоения второго языка, особенно на лексическом и синтаксическом уровнях.",
+    "level": "B2", "focus_tags": ["terminology", "accuracy"],
+    "syntax_load": "high", "terminology_load": "high",
+    "teaching_points": ["academic_terms", "adverbial_modifier"], "domain": "academic"
+  },
+  {
+    "source_text": "为确保项目按期交付，各部门需要建立更加高效的沟通机制。",
+    "reference_translation": "Для обеспечения своевременной сдачи проекта отделам необходимо создать более эффективный механизм коммуникации.",
+    "level": "B2", "focus_tags": ["strategy", "grammar"],
+    "syntax_load": "medium", "terminology_load": "medium",
+    "teaching_points": ["purpose_clause", "dative_subject"], "domain": "business"
+  },
+  {
+    "source_text": "搬到新城市之后，适应不同的生活方式花了将近半年。",
+    "reference_translation": "После переезда в новый город адаптация к другому образу жизни заняла почти полгода.",
+    "level": "B2", "focus_tags": ["fluency", "accuracy"],
+    "syntax_load": "medium", "terminology_load": "low",
+    "teaching_points": ["time_expression", "preposition_governance"], "domain": "daily_life"
+  },
+  {
+    "source_text": "翻译不仅是语言符号的转换，更涉及深层的认知加工和文化协商，需要译者在忠实与创造性之间找到动态平衡。",
+    "reference_translation": "Перевод — это не только преобразование языковых знаков, но и глубинная когнитивная обработка и культурное согласование, требующие от переводчика динамического баланса между верностью и креативностью.",
+    "level": "C1", "focus_tags": ["strategy", "accuracy"],
+    "syntax_load": "high", "terminology_load": "high",
+    "teaching_points": ["academic_discourse", "participle_clause"], "domain": "academic"
+  },
+  {
+    "source_text": "神经机器翻译在资源丰富语种上已接近人工水平，但低资源语种仍受限于平行语料规模和领域适配性。",
+    "reference_translation": "Нейронный машинный перевод для ресурсообеспеченных языков уже приближается к уровню человека, однако для малоресурсных языков он по-прежнему ограничен объёмом параллельных корпусов и доменной адаптируемостью.",
+    "level": "C1", "focus_tags": ["terminology", "strategy"],
+    "syntax_load": "high", "terminology_load": "high",
+    "teaching_points": ["technical_contrast", "compound_sentence"], "domain": "technology"
+  },
+  {
+    "source_text": "在全球化背景下，本地化翻译已从单纯的语言转换发展为涵盖产品适配和区域合规的系统工程。",
+    "reference_translation": "В контексте глобализации локализационный перевод превратился из простого языкового преобразования в системную инженерию, охватывающую адаптацию продукта и региональное соответствие.",
+    "level": "C1", "focus_tags": ["strategy", "accuracy"],
+    "syntax_load": "high", "terminology_load": "high",
+    "teaching_points": ["business_discourse", "participle_phrase"], "domain": "business"
+  },
+  {
+    "source_text": "元认知策略的培养对提高学生的自主学习能力和翻译素养至关重要。",
+    "reference_translation": "Развитие метакогнитивных стратегий имеет решающее значение для повышения способности студентов к самостоятельному обучению и переводческой грамотности.",
+    "level": "C1", "focus_tags": ["terminology", "fluency"],
+    "syntax_load": "high", "terminology_load": "high",
+    "teaching_points": ["academic_vocabulary", "noun_chain"], "domain": "academic"
+  },
+  {
+    "source_text": "语言学习的真正价值不在于考了多少证书，而在于它打开了理解另一种文化思维方式的窗口。",
+    "reference_translation": "Истинная ценность изучения языка заключается не в количестве полученных сертификатов, а в том, что оно открывает окно в понимание другого культурного образа мышления.",
+    "level": "C1", "focus_tags": ["fluency", "strategy"],
+    "syntax_load": "medium", "terminology_load": "low",
+    "teaching_points": ["contrast_structure", "abstract_nouns"], "domain": "education"
+  }
+]

@@ -1,0 +1,121 @@
+[
+  {
+    "source_text": "Я студент.",
+    "reference_translation": "我是学生。",
+    "level": "A1", "focus_tags": ["accuracy"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["basic_sentence"], "domain": "education"
+  },
+  {
+    "source_text": "Мне нравится читать книги.",
+    "reference_translation": "我喜欢读书。",
+    "level": "A1", "focus_tags": ["accuracy"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["dative_subject", "infinitive"], "domain": "daily_life"
+  },
+  {
+    "source_text": "Сегодня холодная погода.",
+    "reference_translation": "今天天气很冷。",
+    "level": "A1", "focus_tags": ["fluency"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["weather_expression", "adjective"], "domain": "daily_life"
+  },
+  {
+    "source_text": "Она работает преподавателем в университете.",
+    "reference_translation": "她在大学当老师。",
+    "level": "A2", "focus_tags": ["accuracy", "grammar"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["instrumental_case", "profession"], "domain": "education"
+  },
+  {
+    "source_text": "Я каждый день занимаюсь русским языком по два часа.",
+    "reference_translation": "我每天学两个小时的俄语。",
+    "level": "A2", "focus_tags": ["fluency", "accuracy"],
+    "syntax_load": "low", "terminology_load": "low",
+    "teaching_points": ["time_duration", "reflexive_verb"], "domain": "education"
+  },
+  {
+    "source_text": "Мой друг работает в крупной IT-компании и занимается разработкой программного обеспечения.",
+    "reference_translation": "我的朋友在一家大型IT公司工作，从事软件开发。",
+    "level": "A2", "focus_tags": ["terminology", "accuracy"],
+    "syntax_load": "medium", "terminology_load": "medium",
+    "teaching_points": ["compound_sentence", "technical_vocabulary"], "domain": "technology"
+  },
+  {
+    "source_text": "Преподаватель объяснил, почему в этом предложении нужен другой падеж.",
+    "reference_translation": "老师解释了为什么这个句子需要用另一个格。",
+    "level": "B1", "focus_tags": ["grammar"],
+    "syntax_load": "medium", "terminology_load": "low",
+    "teaching_points": ["subordinate_clause", "case_governance"], "domain": "education"
+  },
+  {
+    "source_text": "Система автоматически фиксирует ошибки и предлагает упражнения для их исправления.",
+    "reference_translation": "系统自动记录错误并提供改正练习。",
+    "level": "B1", "focus_tags": ["accuracy", "terminology"],
+    "syntax_load": "medium", "terminology_load": "low",
+    "teaching_points": ["compound_predicate", "purpose_clause"], "domain": "technology"
+  },
+  {
+    "source_text": "Несмотря на трудности перевода, важно сохранять баланс между точностью и естественностью выражения.",
+    "reference_translation": "尽管翻译有难度，但保持准确和表达自然之间的平衡很重要。",
+    "level": "B1", "focus_tags": ["strategy", "fluency"],
+    "syntax_load": "medium", "terminology_load": "medium",
+    "teaching_points": ["concessive_phrase", "abstract_nouns"], "domain": "education"
+  },
+  {
+    "source_text": "Перед началом проекта необходимо оценить объём работы и распределить задачи между участниками.",
+    "reference_translation": "项目开始前需要评估工作量并在参与者之间分配任务。",
+    "level": "B2", "focus_tags": ["strategy", "accuracy"],
+    "syntax_load": "medium", "terminology_load": "medium",
+    "teaching_points": ["impersonal_construction", "distributive_expression"], "domain": "business"
+  },
+  {
+    "source_text": "В последние годы технологии машинного перевода значительно продвинулись благодаря развитию нейронных сетей.",
+    "reference_translation": "近年来，得益于神经网络的发展，机器翻译技术有了显著进步。",
+    "level": "B2", "focus_tags": ["terminology", "accuracy"],
+    "syntax_load": "medium", "terminology_load": "medium",
+    "teaching_points": ["causal_phrase", "technical_terms"], "domain": "technology"
+  },
+  {
+    "source_text": "Исследования показывают, что двуязычные люди обладают более развитыми когнитивными способностями и лучше справляются с многозадачностью.",
+    "reference_translation": "研究表明，双语者具有更发达的认知能力，在应对多任务时表现更好。",
+    "level": "B2", "focus_tags": ["terminology", "fluency"],
+    "syntax_load": "high", "terminology_load": "high",
+    "teaching_points": ["academic_discourse", "comparative"], "domain": "academic"
+  },
+  {
+    "source_text": "Культурная адаптация контента требует не только лингвистических знаний, но и понимания социальных норм и ценностей целевой аудитории.",
+    "reference_translation": "内容的文化适配不仅需要语言学知识，还需要对目标受众的社会规范和价值观的理解。",
+    "level": "B2", "focus_tags": ["strategy", "accuracy"],
+    "syntax_load": "high", "terminology_load": "high",
+    "teaching_points": ["contrast_structure", "genitive_chain"], "domain": "business"
+  },
+  {
+    "source_text": "Хотя машинный перевод значительно ускоряет процесс, окончательное решение о выборе варианта всегда должно оставаться за человеком.",
+    "reference_translation": "尽管机器翻译大大加快了流程，但最终选择译法的决定权应始终掌握在人手中。",
+    "level": "B2", "focus_tags": ["fluency", "strategy"],
+    "syntax_load": "medium", "terminology_load": "low",
+    "teaching_points": ["concessive_clause", "modal_predicate"], "domain": "technology"
+  },
+  {
+    "source_text": "Качество перевода определяется не только правильностью грамматических конструкций, но и способностью передать стилистические особенности и прагматические нюансы оригинала.",
+    "reference_translation": "翻译质量不仅取决于语法结构的正确性，还取决于传达原文风格特征和语用细微差别的能力。",
+    "level": "C1", "focus_tags": ["strategy", "accuracy"],
+    "syntax_load": "high", "terminology_load": "high",
+    "teaching_points": ["academic_definition", "parallel_negation"], "domain": "academic"
+  },
+  {
+    "source_text": "В процессе локализации программного обеспечения необходимо учитывать не только языковые различия, но и технические ограничения целевых платформ, а также культурные ожидания пользователей.",
+    "reference_translation": "在软件本地化过程中，不仅要考虑语言差异，还要考虑目标平台的技术限制以及用户的文化期望。",
+    "level": "C1", "focus_tags": ["strategy", "terminology"],
+    "syntax_load": "high", "terminology_load": "high",
+    "teaching_points": ["enumeration_structure", "compound_negation"], "domain": "technology"
+  },
+  {
+    "source_text": "Несмотря на стремительное развитие технологий искусственного интеллекта, полноценная замена человека-переводчика в обозримом будущем маловероятна, поскольку понимание культурного контекста и эмоциональной окраски текста остаётся исключительно человеческой способностью.",
+    "reference_translation": "尽管人工智能技术飞速发展，但在可预见的未来完全替代人工翻译的可能性很小，因为对文化语境和文本情感色彩的理解仍然是人类独有的能力。",
+    "level": "C1", "focus_tags": ["strategy", "fluency"],
+    "syntax_load": "high", "terminology_load": "medium",
+    "teaching_points": ["complex_contrast", "causal_clause"], "domain": "academic"
+  }
+]

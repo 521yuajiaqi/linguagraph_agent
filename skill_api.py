@@ -31,6 +31,7 @@ from lingua_agent.tools.learning import (
     EVALUATION_DIMENSIONS,
     analyze_grammar,
     build_vocabulary_cards,
+    compute_ability_rank,
     estimate_difficulty,
     generate_layered_hints,
     score_translation,
@@ -98,44 +99,32 @@ def _normalize_exercise_text(text: str) -> str:
 
 # ── Exercise Bank (replicated from nodes.py for independence) ─────────────
 
-_EXERCISE_BANK = {
-    "zh_ru": [
-        {
-            "source": "高校教师正在设计一套面向翻译学习者的智能训练任务。",
-            "reference": "Преподаватель университета разрабатывает набор интеллектуальных тренировочных заданий для изучающих перевод.",
-        },
-        {
-            "source": "学生需要先理解句子结构，再选择合适的俄语表达。",
-            "reference": "Студенту нужно сначала понять структуру предложения, а затем выбрать подходящее русское выражение.",
-        },
-        {
-            "source": "这个工具会记录常见错误，并安排下一次复习。",
-            "reference": "Этот инструмент фиксирует типичные ошибки и планирует следующее повторение.",
-        },
-        {
-            "source": "翻译训练不只是替换词语，还要注意语境和搭配。",
-            "reference": "Тренировка перевода - это не только замена слов, но и учет контекста и сочетаемости.",
-        },
-    ],
-    "ru_zh": [
-        {
-            "source": "Студенты сравнивают свой перевод с образцом и исправляют типичные ошибки.",
-            "reference": "学生把自己的译文与范例进行比较，并改正常见错误。",
-        },
-        {
-            "source": "Преподаватель объясняет, почему в этом предложении нужен другой падеж.",
-            "reference": "教师解释为什么这个句子里需要使用另一个格。",
-        },
-        {
-            "source": "Система предлагает короткое упражнение после каждой проверки перевода.",
-            "reference": "系统在每次译文批改后提供一个简短练习。",
-        },
-        {
-            "source": "Хороший перевод сохраняет смысл текста и звучит естественно.",
-            "reference": "好的翻译既保留文本意思，又表达自然。",
-        },
-    ],
-}
+_FALLBACK_CACHE: dict[str, list[dict[str, str]]] = {}
+
+
+def _load_fallback_bank(language_pair: str) -> list[dict[str, str]]:
+    """Load basic (source, reference) pairs from the exercise JSON for safe fallback."""
+    if language_pair in _FALLBACK_CACHE:
+        return _FALLBACK_CACHE[language_pair]
+
+    import json
+    from pathlib import Path
+
+    json_path = Path(__file__).resolve().parent / "resources" / "exercises" / f"{language_pair}.json"
+    if not json_path.exists():
+        fallback = [{"source": "翻译练习", "reference": "Упражнение по переводу"}]
+        _FALLBACK_CACHE[language_pair] = fallback
+        return fallback
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    pairs = [
+        {"source": item["source_text"], "reference": item["reference_translation"]}
+        for item in data
+    ]
+    _FALLBACK_CACHE[language_pair] = pairs
+    return pairs
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -256,7 +245,7 @@ def skill_generate(payload: GenerateRequest):
             exercise_source = "llm"
         else:
             # Safe fallback: bank with lowest difficulty
-            bank = _EXERCISE_BANK.get(payload.language_pair, _EXERCISE_BANK["zh_ru"])
+            bank = _load_fallback_bank(payload.language_pair)
             prev = payload.previous_source.strip()
             if prev:
                 for idx, ex in enumerate(bank):
@@ -327,9 +316,42 @@ def skill_terminology(payload: TerminologyRequest):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+#  Skill 4: RPG Ability Rank
+# ═══════════════════════════════════════════════════════════════════════════
+
+class RankRequest(BaseModel):
+    accuracy: int = Field(default=0, ge=0, le=9999)
+    fluency: int = Field(default=0, ge=0, le=9999)
+    terminology: int = Field(default=0, ge=0, le=9999)
+    grammar: int = Field(default=0, ge=0, le=9999)
+    strategy: int = Field(default=0, ge=0, le=9999)
+
+
+@app.post("/api/skill/rank")
+def skill_rank(payload: RankRequest):
+    """Compute translator rank, title, and bottleneck from five-dimension XP.
+
+    Pure computation, no LLM — always < 10ms.
+    """
+    ability_xp = {
+        "accuracy": payload.accuracy,
+        "fluency": payload.fluency,
+        "terminology": payload.terminology,
+        "grammar": payload.grammar,
+        "strategy": payload.strategy,
+    }
+    return compute_ability_rank(ability_xp)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 #  Health Check
 # ═══════════════════════════════════════════════════════════════════════════
 
 @app.get("/api/skill/health")
 def health_check():
     return {"status": "ok", "service": "LinguaGraph Skills API"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("skill_api:app", host="127.0.0.1", port=8001, reload=True)
