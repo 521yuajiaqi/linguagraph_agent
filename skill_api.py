@@ -39,6 +39,18 @@ from lingua_agent.tools.learning import (
     validate_llm_evaluation,
 )
 
+# ── Helpers ────────────────────────────────────────────────────────────────
+
+# Coze bot may pass Chinese names; normalize to code format
+_LANG_ALIASES = {
+    "中俄": "zh_ru", "zh-ru": "zh_ru", "汉俄": "zh_ru",
+    "俄中": "ru_zh", "ru-zh": "ru_zh", "俄汉": "ru_zh",
+}
+
+def _normalize_pair(raw: str) -> str:
+    return _LANG_ALIASES.get(raw.strip(), raw.strip())
+
+
 # ── FastAPI App ────────────────────────────────────────────────────────────
 
 app = FastAPI(title="LinguaGraph Skills API")
@@ -148,7 +160,8 @@ def skill_evaluate(payload: EvaluateRequest):
     revision advice, and dimension XP.  Designed for Coze HTTP nodes
     with a hard 30s timeout — falls back to rule engine if LLM is slow.
     """
-    pair_config = load_language_pair(payload.language_pair)
+    pair = _normalize_pair(payload.language_pair)
+    pair_config = load_language_pair(pair)
     dimensions = pair_config.get("evaluation_dimensions", [])
 
     if not payload.user_translation.strip():
@@ -207,7 +220,8 @@ def skill_generate(payload: GenerateRequest):
 
     Strategy: LLM with few-shot bank examples (primary) → bank candidate (fallback).
     """
-    pair_config = load_language_pair(payload.language_pair)
+    pair = _normalize_pair(payload.language_pair)
+    pair_config = load_language_pair(pair)
 
     # Build exercise blueprint from learner state
     blueprint = build_exercise_blueprint({
@@ -224,7 +238,7 @@ def skill_generate(payload: GenerateRequest):
 
     # ── Primary: LLM with few-shot bank examples ──
     examples = pick_few_shot_examples(
-        payload.language_pair, blueprint, payload.previous_source, count=2,
+        pair, blueprint, payload.previous_source, count=2,
     )
     system, user = build_llm_exercise_messages(pair_config, payload.domain, blueprint, examples)
     generated = llm.complete(system, user)
@@ -237,7 +251,7 @@ def skill_generate(payload: GenerateRequest):
     else:
         # ── Fallback: bank candidate ──
         selection = select_exercise_candidate(
-            payload.language_pair, blueprint, payload.previous_source,
+            pair, blueprint, payload.previous_source,
         )
         if selection is not None:
             source_text = selection["candidate"]["source_text"]
@@ -245,7 +259,7 @@ def skill_generate(payload: GenerateRequest):
             exercise_source = "bank"
         else:
             # ── Last resort: any bank entry ──
-            bank = _load_fallback_bank(payload.language_pair)
+            bank = _load_fallback_bank(pair)
             prev = payload.previous_source.strip()
             if prev:
                 for idx, ex in enumerate(bank):
@@ -264,7 +278,7 @@ def skill_generate(payload: GenerateRequest):
     hints = generate_layered_hints(source_text, reference_translation, pair_config)
     vocabulary_cards = build_vocabulary_cards(
         source_text,
-        find_terminology_hits(payload.language_pair, payload.domain, source_text),
+        find_terminology_hits(pair, payload.domain, source_text),
         pair_config,
     )
     grammar_analysis = analyze_grammar(source_text, pair_config)
@@ -302,8 +316,9 @@ def skill_terminology(payload: TerminologyRequest):
 
     Pure rule-engine, no LLM — always completes in < 1s.
     """
-    pair_config = load_language_pair(payload.language_pair)
-    hits = find_terminology_hits(payload.language_pair, payload.domain, payload.source_text)
+    pair = _normalize_pair(payload.language_pair)
+    pair_config = load_language_pair(pair)
+    hits = find_terminology_hits(pair, payload.domain, payload.source_text)
     cards = build_vocabulary_cards(payload.source_text, hits, pair_config)
     grammar = analyze_grammar(payload.source_text, pair_config)
 
