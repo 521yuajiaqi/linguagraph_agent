@@ -46,9 +46,19 @@ _LANG_ALIASES = {
     "中俄": "zh_ru", "zh-ru": "zh_ru", "汉俄": "zh_ru",
     "俄中": "ru_zh", "ru-zh": "ru_zh", "俄汉": "ru_zh",
 }
+_DOMAIN_ALIASES = {
+    "通用": "general", "日常": "general", "生活": "general", "都行": "general",
+    "科技": "technology", "技术": "technology", "ai": "technology",
+    "教育": "education", "学习": "education", "学校": "education", "教学": "education",
+    "商务": "business", "商业": "business", "贸易": "business", "公司": "business", "职场": "business",
+    "学术": "academic", "论文": "academic", "研究": "academic", "理论": "academic",
+}
 
 def _normalize_pair(raw: str) -> str:
     return _LANG_ALIASES.get(raw.strip(), raw.strip())
+
+def _normalize_domain(raw: str) -> str:
+    return _DOMAIN_ALIASES.get(raw.strip(), raw.strip().lower())
 
 
 # ── FastAPI App ────────────────────────────────────────────────────────────
@@ -221,6 +231,7 @@ def skill_generate(payload: GenerateRequest):
     Strategy: LLM with few-shot bank examples (primary) → bank candidate (fallback).
     """
     pair = _normalize_pair(payload.language_pair)
+    domain = _normalize_domain(payload.domain)
     pair_config = load_language_pair(pair)
 
     # Build exercise blueprint from learner state
@@ -229,7 +240,7 @@ def skill_generate(payload: GenerateRequest):
         "learner_profile": payload.learner_profile,
         "error_history": payload.error_history,
         "user_level": payload.user_level,
-        "domain": payload.domain,
+        "domain": domain,
     })
 
     source_text: str
@@ -240,7 +251,7 @@ def skill_generate(payload: GenerateRequest):
     examples = pick_few_shot_examples(
         pair, blueprint, payload.previous_source, count=2,
     )
-    system, user = build_llm_exercise_messages(pair_config, payload.domain, blueprint, examples)
+    system, user = build_llm_exercise_messages(pair_config, domain, blueprint, examples)
     generated = llm.complete(system, user)
     parsed = _parse_json_from_llm(generated)
     validated = validate_generated_exercise_payload(parsed, blueprint)
@@ -278,7 +289,7 @@ def skill_generate(payload: GenerateRequest):
     hints = generate_layered_hints(source_text, reference_translation, pair_config)
     vocabulary_cards = build_vocabulary_cards(
         source_text,
-        find_terminology_hits(pair, payload.domain, source_text),
+        find_terminology_hits(pair, domain, source_text),
         pair_config,
     )
     grammar_analysis = analyze_grammar(source_text, pair_config)
@@ -317,8 +328,9 @@ def skill_terminology(payload: TerminologyRequest):
     Pure rule-engine, no LLM — always completes in < 1s.
     """
     pair = _normalize_pair(payload.language_pair)
+    domain = _normalize_domain(payload.domain)
     pair_config = load_language_pair(pair)
-    hits = find_terminology_hits(pair, payload.domain, payload.source_text)
+    hits = find_terminology_hits(pair, domain, payload.source_text)
     cards = build_vocabulary_cards(payload.source_text, hits, pair_config)
     grammar = analyze_grammar(payload.source_text, pair_config)
 
