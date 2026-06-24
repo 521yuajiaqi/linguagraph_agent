@@ -184,15 +184,59 @@ def select_exercise_candidate(
     return ranked[0] if ranked else None
 
 
+def pick_few_shot_examples(
+    language_pair: str,
+    blueprint: ExerciseBlueprint,
+    previous_source: str,
+    count: int = 2,
+) -> list[dict[str, str]]:
+    """Pick 2-3 exercises from the bank to use as few-shot examples for LLM.
+
+    Matches the blueprint loosely — same level or adjacent level, same or
+    similar domain.  Avoids the previous source text.
+    """
+    bank = _load_exercise_bank(language_pair)
+    blueprint_idx = LEVEL_ORDER.index(blueprint["target_level"]) if blueprint["target_level"] in LEVEL_ORDER else 2
+
+    scored: list[tuple[int, dict]] = []
+    for candidate in bank:
+        if previous_source and candidate["source_text"] == previous_source:
+            continue
+        s = 0
+        candidate_idx = LEVEL_ORDER.index(candidate["level"]) if candidate["level"] in LEVEL_ORDER else 2
+        level_gap = abs(candidate_idx - blueprint_idx)
+        if level_gap == 0:
+            s += 5
+        elif level_gap == 1:
+            s += 3
+        if candidate["domain"] == blueprint.get("preferred_domain"):
+            s += 2
+        scored.append((s, candidate))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+
+    result: list[dict[str, str]] = []
+    for _, c in scored:
+        result.append({
+            "source_text": c["source_text"],
+            "reference_translation": c["reference_translation"],
+        })
+        if len(result) >= count:
+            break
+    return result
+
+
 def build_llm_exercise_messages(
     pair_config: Mapping[str, Any],
     domain: str,
     blueprint: ExerciseBlueprint,
+    examples: list[dict[str, str]] | None = None,
 ) -> tuple[str, str]:
     return build_exercise_generation_prompt(
         display_name=pair_config["display_name"],
         domain=domain,
         blueprint=blueprint,
+        examples=examples,
     )
 
 

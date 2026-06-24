@@ -24,6 +24,7 @@ from lingua_agent.tools.exercise_generation import (
     ExerciseBlueprint,
     build_exercise_blueprint,
     build_llm_exercise_messages,
+    pick_few_shot_examples,
     select_exercise_candidate,
     validate_generated_exercise_payload,
 )
@@ -204,8 +205,7 @@ class GenerateRequest(BaseModel):
 def skill_generate(payload: GenerateRequest):
     """Generate a translation exercise tailored to the learner.
 
-    Strategy: exercise bank first → LLM fallback → bank safe fallback.
-    Also returns layered hints, vocabulary cards, and grammar analysis.
+    Strategy: LLM with few-shot bank examples (primary) → bank candidate (fallback).
     """
     pair_config = load_language_pair(payload.language_pair)
 
@@ -218,33 +218,33 @@ def skill_generate(payload: GenerateRequest):
         "domain": payload.domain,
     })
 
-    # Try tagged bank first, then selection
-    selection = select_exercise_candidate(
-        payload.language_pair,
-        blueprint,
-        payload.previous_source,
-    )
-
     source_text: str
     reference_translation: str
     exercise_source: str
 
-    if selection is not None:
-        source_text = selection["candidate"]["source_text"]
-        reference_translation = selection["candidate"]["reference_translation"]
-        exercise_source = "bank"
+    # ── Primary: LLM with few-shot bank examples ──
+    examples = pick_few_shot_examples(
+        payload.language_pair, blueprint, payload.previous_source, count=2,
+    )
+    system, user = build_llm_exercise_messages(pair_config, payload.domain, blueprint, examples)
+    generated = llm.complete(system, user)
+    parsed = _parse_json_from_llm(generated)
+    validated = validate_generated_exercise_payload(parsed, blueprint)
+    if validated is not None:
+        source_text = _normalize_exercise_text(validated["source_text"])
+        reference_translation = _normalize_exercise_text(validated["reference_translation"])
+        exercise_source = "llm"
     else:
-        # LLM fallback
-        system, user = build_llm_exercise_messages(pair_config, payload.domain, blueprint)
-        generated = llm.complete(system, user)
-        parsed = _parse_json_from_llm(generated)
-        validated = validate_generated_exercise_payload(parsed, blueprint)
-        if validated is not None:
-            source_text = _normalize_exercise_text(validated["source_text"])
-            reference_translation = _normalize_exercise_text(validated["reference_translation"])
-            exercise_source = "llm"
+        # ── Fallback: bank candidate ──
+        selection = select_exercise_candidate(
+            payload.language_pair, blueprint, payload.previous_source,
+        )
+        if selection is not None:
+            source_text = selection["candidate"]["source_text"]
+            reference_translation = selection["candidate"]["reference_translation"]
+            exercise_source = "bank"
         else:
-            # Safe fallback: bank with lowest difficulty
+            # ── Last resort: any bank entry ──
             bank = _load_fallback_bank(payload.language_pair)
             prev = payload.previous_source.strip()
             if prev:

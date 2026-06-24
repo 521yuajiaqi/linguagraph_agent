@@ -194,18 +194,35 @@ def build_exercise_generation_prompt(
     display_name: str,
     domain: str,
     blueprint: dict[str, Any],
+    examples: list[dict[str, str]] | None = None,
 ) -> tuple[str, str]:
     """Build (system, user) prompt for LLM-generated translation exercises.
 
-    Moved from ``lingua_agent/tools/exercise_generation.py`` to keep all
-    LLM prompts in one place.
+    If ``examples`` is provided, they are included as few-shot style references
+    so the LLM produces exercises of similar difficulty and format.
     """
     system = (
-        "你是翻译教学专家。"
+        "你是翻译教学专家，擅长根据学生水平设计难度适配的翻译练习题。"
         "你必须输出严格 JSON，不得输出解释、标题、代码块或额外说明。"
     )
+
+    example_text = ""
+    if examples:
+        parts = []
+        for i, ex in enumerate(examples, 1):
+            parts.append(
+                f"样例{i}：\n"
+                f"  原文：{ex.get('source_text', '')}\n"
+                f"  参考译文：{ex.get('reference_translation', '')}"
+            )
+        example_text = (
+            "\n【参考样例题】请按以下风格和难度出新题，不要照抄：\n"
+            + "\n".join(parts)
+            + "\n"
+        )
+
     user = (
-        f"语种方向：{display_name}\n"
+        f"请出一道{display_name}翻译练习题。\n\n"
         f"领域：{domain}\n"
         f"主训练维度：{blueprint['primary_focus']}\n"
         f"目标等级：{blueprint['target_level']}\n"
@@ -213,7 +230,9 @@ def build_exercise_generation_prompt(
         f"句法负荷：{blueprint['syntax_load']}\n"
         f"术语负荷：{blueprint['terminology_load']}\n"
         f"教学意图：{blueprint['teaching_intent']}\n"
-        '请输出 {{"source_text": "...", "reference_translation": "..."}}'
+        f"{example_text}"
+        "要求：原文和参考译文必须是你原创的，不要重复样例题。"
+        '输出 {{"source_text": "...", "reference_translation": "..."}}'
     )
     return system, user
 
