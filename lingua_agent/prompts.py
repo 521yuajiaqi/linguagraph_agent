@@ -201,8 +201,48 @@ def build_exercise_generation_prompt(
     If ``examples`` is provided, they are included as few-shot style references
     so the LLM produces exercises of similar difficulty and format.
     """
+    target = blueprint["target_level"]
+
+    # Level-specific constraints — give the LLM concrete word-count and
+    # complexity targets so A1 exercises actually differ from C1.
+    level_guide = {
+        "A1": (
+            "【词数】3-6 词，必须只用 1 个简单句。"
+            "【词汇】限高频基础词：人称（я/ты/он）、家庭成员、天气、时间、数字、颜色、常见食物。"
+            "【语法】只能用现在时、主谓宾或主系表基本语序。禁止任何从句、形动词、副动词、被动结构。"
+            "【话题】自我介绍、问候、家庭、天气、日常物品。"
+        ),
+        "A2": (
+            "【词数】6-10 词，可用 1 个并列结构（и/а/но 连接）。"
+            "【词汇】日常高频词：购物、出行、爱好、饮食、服饰、简单情绪。"
+            "【语法】可用简单过去时或将来时，不超过 1 个时态切换。禁止从句。"
+            "【话题】周末计划、日常习惯、简单喜好、家庭介绍。"
+        ),
+        "B1": (
+            "【词数】10-18 词，可含 1 个从句（что/чтобы/который/если/когда/потому что）。"
+            "【词汇】开始涉及抽象词：观点、感受、计划、原因、结果。"
+            "【语法】必须包含 1 个语法难点：运动动词（идти/ходить/ехать/ездить）、"
+            "完成体/未完成体区分、动词支配关系（ждать+二格/四格）、带-ся 动词。"
+            "【话题】学习经历、旅行见闻、职业规划、社会现象简述。"
+        ),
+        "B2": (
+            "【词数】15-25 词，可含 1-2 个从句（允许嵌套一层）。"
+            "【词汇】专业词汇适量：科技趋势、职场沟通、环境议题、经济常识。术语必须准确。"
+            "【语法】必须使用以下至少 1 种高级结构：形动词短语（主动/被动）、副动词短语、"
+            "被动结构（带-ся 或被动形动词短尾）、带 либо/нибудь 的不定代词。"
+            "【话题】技术评论、职场分析、社会时评、专业领域概述。"
+        ),
+        "C1": (
+            "【词数】20-40 词，可含多层嵌套（2-3 层从句）。"
+            "【词汇】学术/专业/文化深度词汇，允许低频词和术语。需体现语用细微差异（正式/口语、褒贬）。"
+            "【语法】必须混合使用以下至少 2 种：多重从句叠加、主动形动词、被动形动词、"
+            "副动词、无人称句、不定式句、带语气词（же/ли/ведь/разве）的修辞结构。"
+            "【话题】学术论述、专业分析、文化评论、哲学思辨、政策解读。"
+        ),
+    }
+
     system = (
-        "你是翻译教学专家，擅长根据学生水平设计难度适配的翻译练习题。"
+        "你是翻译教学专家，精通 CEFR 等级标准。"
         "你必须输出严格 JSON，不得输出解释、标题、代码块或额外说明。"
     )
 
@@ -225,13 +265,13 @@ def build_exercise_generation_prompt(
         f"请出一道{display_name}翻译练习题。\n\n"
         f"领域：{domain}\n"
         f"主训练维度：{blueprint['primary_focus']}\n"
-        f"目标等级：{blueprint['target_level']}\n"
-        f"难度窗口：{blueprint['difficulty_band']['floor']} - {blueprint['difficulty_band']['ceiling']}\n"
+        f"目标等级：{target}\n"
         f"句法负荷：{blueprint['syntax_load']}\n"
         f"术语负荷：{blueprint['terminology_load']}\n"
-        f"教学意图：{blueprint['teaching_intent']}\n"
+        f"教学意图：{blueprint['teaching_intent']}\n\n"
+        f"【{target} 等级要求】{level_guide.get(target, level_guide['B1'])}\n"
         f"{example_text}"
-        "要求：原文和参考译文必须是你原创的，不要重复样例题。"
+        "要求：严格按照等级要求出题。原文和参考译文必须是你原创的，不要照抄样例题。"
         '输出 {{"source_text": "...", "reference_translation": "..."}}'
     )
     return system, user
