@@ -48,7 +48,7 @@ _LANG_ALIASES = {
 }
 _DOMAIN_ALIASES = {
     "通用": "general", "日常": "general", "生活": "general", "都行": "general",
-    "科技": "technology", "技术": "technology", "ai": "technology",
+    "科技": "technology", "技术": "technology", "科学": "technology", "ai": "technology",
     "教育": "education", "学习": "education", "学校": "education", "教学": "education",
     "商务": "business", "商业": "business", "贸易": "business", "公司": "business", "职场": "business",
     "学术": "academic", "论文": "academic", "研究": "academic", "理论": "academic",
@@ -232,6 +232,7 @@ def skill_generate(payload: GenerateRequest):
     """
     pair = _normalize_pair(payload.language_pair)
     domain = _normalize_domain(payload.domain)
+    print(f"[generate] pair={pair} domain={domain} level={payload.user_level} focus={payload.focus_areas}", flush=True)
     pair_config = load_language_pair(pair)
 
     # Build exercise blueprint from learner state
@@ -284,6 +285,8 @@ def skill_generate(payload: GenerateRequest):
             source_text = fallback["source"]
             reference_translation = fallback["reference"]
             exercise_source = "bank_safe_fallback"
+
+    print(f"[generate] source={exercise_source} text={source_text[:60]}... ref={reference_translation[:40]}...", flush=True)
 
     # Generate hints, vocab cards, and grammar analysis
     hints = generate_layered_hints(source_text, reference_translation, pair_config)
