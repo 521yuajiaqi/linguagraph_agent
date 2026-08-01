@@ -214,14 +214,77 @@ def skill_evaluate(payload: EvaluateRequest):
 #  Skill 2: Exercise Generation
 # ═══════════════════════════════════════════════════════════════════════════
 
+def _coerce_list(raw: Any) -> list:
+    """Coerce a JSON string or comma-separated string to list."""
+    if raw is None:
+        return []
+    if isinstance(raw, list):
+        return raw
+    if isinstance(raw, str):
+        s = raw.strip()
+        if not s or s == "[]":
+            return []
+        if s.startswith("["):
+            try:
+                val = json.loads(s)
+                return val if isinstance(val, list) else [str(val)]
+            except (json.JSONDecodeError, TypeError):
+                pass
+        # "grammar,accuracy" → ["grammar","accuracy"]
+        return [x.strip() for x in s.split(",") if x.strip()]
+    return [str(raw)]
+
+def _coerce_dict(raw: Any) -> dict:
+    """Coerce a JSON string to dict."""
+    if raw is None:
+        return {}
+    if isinstance(raw, dict):
+        return raw
+    if isinstance(raw, str):
+        s = raw.strip()
+        if not s or s == "{}":
+            return {}
+        try:
+            val = json.loads(s)
+            return val if isinstance(val, dict) else {}
+        except (json.JSONDecodeError, TypeError):
+            return {}
+    return {}
+
+def _normalize_level(raw: str) -> str:
+    """Normalize user_level to standard CEFR code."""
+    level_map = {
+        "入门": "A1", "初级": "A2", "中级": "B1",
+        "中高级": "B2", "高级": "C1",
+        "a1": "A1", "a2": "A2", "b1": "B1", "b2": "B2", "c1": "C1",
+    }
+    return level_map.get(raw.strip(), raw.strip().upper())
+
+
 class GenerateRequest(BaseModel):
     language_pair: str = Field(default="zh_ru", description="语种对")
     user_level: str = Field(default="B1", description="学生CEFR水平")
     domain: str = Field(default="general", description="领域")
-    focus_areas: list[str] = Field(default_factory=list, description="训练焦点维度")
+    focus_areas_raw: Any = Field(default=None, alias="focus_areas")
     previous_source: str = Field(default="", description="上一题原文，避免重复")
-    learner_profile: dict[str, Any] = Field(default_factory=dict)
-    error_history: list[dict[str, Any]] = Field(default_factory=list)
+    learner_profile_raw: Any = Field(default=None, alias="learner_profile")
+    error_history_raw: Any = Field(default=None, alias="error_history")
+
+    @property
+    def focus_areas(self) -> list[str]:
+        return _coerce_list(self.focus_areas_raw)
+
+    @property
+    def learner_profile(self) -> dict:
+        return _coerce_dict(self.learner_profile_raw)
+
+    @property
+    def error_history(self) -> list[dict]:
+        raw = _coerce_list(self.error_history_raw)
+        return [_coerce_dict(item) for item in raw]
+
+    def model_post_init(self, __context):
+        self.user_level = _normalize_level(self.user_level)
 
 
 @app.post("/api/skill/generate")
