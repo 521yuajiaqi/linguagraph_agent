@@ -256,7 +256,7 @@ from functools import lru_cache
 from datetime import datetime, timedelta
 
 _EXERCISE_CACHE: dict[str, tuple[dict, datetime]] = {}
-_CACHE_TTL = timedelta(minutes=3)
+_CACHE_TTL = timedelta(seconds=60)
 
 def _normalize_level(raw: str) -> str:
     """Normalize user_level to standard CEFR code."""
@@ -318,10 +318,13 @@ def skill_generate(payload: GenerateRequest):
     reference_translation: str
     exercise_source: str
 
-    # ── Cache check: same level+domain within 3min returns cached exercise ──
+    # ── Cache check: same level+domain within 60s returns cached (skip if user wants new one) ──
     cache_key = f"{pair}|{domain}|{payload.user_level}|{blueprint['primary_focus']}"
     now = datetime.now()
-    if cache_key in _EXERCISE_CACHE:
+    if payload.previous_source:
+        # User is asking for a DIFFERENT exercise → don't use cache
+        cached_data = None
+    elif cache_key in _EXERCISE_CACHE:
         cached_data, cached_time = _EXERCISE_CACHE[cache_key]
         if now - cached_time < _CACHE_TTL and cached_data.get("source_text"):
             print(f"[generate] cache HIT key={cache_key} text={cached_data['source_text'][:40]}", flush=True)
