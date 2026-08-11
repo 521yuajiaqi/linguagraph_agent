@@ -341,42 +341,45 @@ def skill_generate(payload: GenerateRequest):
         )
         system, user = build_llm_exercise_messages(pair_config, domain, blueprint, examples)
         generated = llm.complete(system, user)
-    parsed = _parse_json_from_llm(generated)
-    validated = validate_generated_exercise_payload(parsed, blueprint)
-    if validated is not None:
-        source_text = _normalize_exercise_text(validated["source_text"])
-        reference_translation = _normalize_exercise_text(validated["reference_translation"])
-        exercise_source = "llm"
-        # Cache for 3 minutes
-        _EXERCISE_CACHE[cache_key] = (
-            {"source_text": source_text, "reference_translation": reference_translation},
-            now,
-        )
-    else:
-        # ── Fallback: bank candidate ──
-        selection = select_exercise_candidate(
-            pair, blueprint, payload.previous_source,
-        )
-        if selection is not None:
-            source_text = selection["candidate"]["source_text"]
-            reference_translation = selection["candidate"]["reference_translation"]
-            exercise_source = "bank"
+        parsed = _parse_json_from_llm(generated)
+        validated = validate_generated_exercise_payload(parsed, blueprint)
+        if validated is not None:
+            source_text = _normalize_exercise_text(validated["source_text"])
+            reference_translation = _normalize_exercise_text(validated["reference_translation"])
+            exercise_source = "llm"
+            # Cache for 3 minutes
+            _EXERCISE_CACHE[cache_key] = (
+                {"source_text": source_text, "reference_translation": reference_translation},
+                now,
+            )
         else:
-            # ── Last resort: any bank entry ──
-            bank = _load_fallback_bank(pair)
-            prev = payload.previous_source.strip()
-            if prev:
-                for idx, ex in enumerate(bank):
-                    if ex["source"] == prev:
-                        fallback = bank[(idx + 1) % len(bank)]
-                        break
+            # ── Fallback: bank candidate ──
+            selection = select_exercise_candidate(
+                pair, blueprint, payload.previous_source,
+            )
+            if selection is not None:
+                source_text = selection["candidate"]["source_text"]
+                reference_translation = selection["candidate"]["reference_translation"]
+                exercise_source = "bank"
+            else:
+                # ── Last resort: any bank entry ──
+                bank = _load_fallback_bank(pair)
+                prev = payload.previous_source.strip()
+                if prev:
+                    for idx, ex in enumerate(bank):
+                        if ex["source"] == prev:
+                            fallback = bank[(idx + 1) % len(bank)]
+                            break
+                    else:
+                        fallback = bank[0]
                 else:
                     fallback = bank[0]
-            else:
-                fallback = bank[0]
-            source_text = fallback["source"]
-            reference_translation = fallback["reference"]
-            exercise_source = "bank_safe_fallback"
+                source_text = fallback["source"]
+                reference_translation = fallback["reference"]
+                exercise_source = "bank_safe_fallback"
+    else:
+        # Cache hit path: llm block not needed
+        pass
 
     print(f"[generate] source={exercise_source} text={source_text[:60]}... ref={reference_translation[:40]}...", flush=True)
 
