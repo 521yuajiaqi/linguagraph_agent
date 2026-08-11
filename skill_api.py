@@ -251,6 +251,13 @@ def _coerce_dict(raw: Any) -> dict:
             return {}
     return {}
 
+# Simple in-memory cache: avoid repeated LLM calls for same level/domain
+from functools import lru_cache
+from datetime import datetime, timedelta
+
+_EXERCISE_CACHE: dict[str, tuple[dict, datetime]] = {}
+_CACHE_TTL = timedelta(minutes=3)
+
 def _normalize_level(raw: str) -> str:
     """Normalize user_level to standard CEFR code."""
     level_map = {
@@ -311,18 +318,40 @@ def skill_generate(payload: GenerateRequest):
     reference_translation: str
     exercise_source: str
 
-    # ── Primary: LLM with few-shot bank examples ──
-    examples = pick_few_shot_examples(
-        pair, blueprint, payload.previous_source, count=2,
-    )
-    system, user = build_llm_exercise_messages(pair_config, domain, blueprint, examples)
-    generated = llm.complete(system, user)
+    # ── Cache check: same level+domain within 3min returns cached exercise ──
+    cache_key = f"{pair}|{domain}|{payload.user_level}|{blueprint['primary_focus']}"
+    now = datetime.now()
+    if cache_key in _EXERCISE_CACHE:
+        cached_data, cached_time = _EXERCISE_CACHE[cache_key]
+        if now - cached_time < _CACHE_TTL and cached_data.get("source_text"):
+            print(f"[generate] cache HIT key={cache_key} text={cached_data['source_text'][:40]}", flush=True)
+            source_text = cached_data["source_text"]
+            reference_translation = cached_data["reference_translation"]
+            exercise_source = "cache"
+        else:
+            del _EXERCISE_CACHE[cache_key]
+            cached_data = None
+    else:
+        cached_data = None
+
+    if cached_data is None:
+        # ── Primary: LLM with 1 few-shot bank example (2 was too slow) ──
+        examples = pick_few_shot_examples(
+            pair, blueprint, payload.previous_source, count=1,
+        )
+        system, user = build_llm_exercise_messages(pair_config, domain, blueprint, examples)
+        generated = llm.complete(system, user)
     parsed = _parse_json_from_llm(generated)
     validated = validate_generated_exercise_payload(parsed, blueprint)
     if validated is not None:
         source_text = _normalize_exercise_text(validated["source_text"])
         reference_translation = _normalize_exercise_text(validated["reference_translation"])
         exercise_source = "llm"
+        # Cache for 3 minutes
+        _EXERCISE_CACHE[cache_key] = (
+            {"source_text": source_text, "reference_translation": reference_translation},
+            now,
+        )
     else:
         # ── Fallback: bank candidate ──
         selection = select_exercise_candidate(
